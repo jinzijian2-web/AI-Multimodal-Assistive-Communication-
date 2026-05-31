@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimodal Assistive Communication System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.05rem;
+            opacity: 0.95;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .card h3 {
+            color: #555;
+            margin: 18px 0 10px;
+        }
+
+        .video-container {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #video-feed {
+            width: 100%;
+            height: auto;
+        }
+
+        .result-panel {
+            background: #f5f7fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: 700;
+            color: #666;
+        }
+
+        .value {
+            color: #333;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .emotion-value { color: #e74c3c; }
+        .gesture-value { color: #3498db; }
+        .output-value { color: #27ae60; }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            opacity: 0.92;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .phrase-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .phrase-buttons button {
+            background: #ecf0f1;
+            color: #333;
+            padding: 8px 14px;
+        }
+
+        .phrase-buttons button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .stt-result, .mappings-list {
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            min-height: 50px;
+            color: #333;
+        }
+
+        .mapping-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .mapping-item:last-child {
+            border-bottom: none;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Multimodal Assistive Communication System</h1>
+            <p>An intelligent assistive tool for users with hearing or speech impairments</p>
+        </header>
+
+        <div class="main-grid">
+            <div class="card">
+                <h2>Live Recognition</h2>
+                <div class="video-container">
+                    <img id="video-feed" src="/video_feed" alt="Live video feed">
+                </div>
+
+                <div class="result-panel">
+                    <div class="result-item">
+                        <span class="label">Emotion Recognition</span>
+                        <span class="value emotion-value" id="emotion-result">Waiting...</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">Gesture Recognition</span>
+                        <span class="value gesture-value" id="gesture-result">Waiting...</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">Output Message</span>
+                        <span class="value output-value" id="output-message">Waiting for recognition...</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <button onclick="speakOutput()" class="btn-primary">Speak Output</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Control Panel</h2>
+
+                <div class="section">
+                    <h3>Text Input</h3>
+                    <div class="input-group">
+                        <input type="text" id="text-input" placeholder="Enter text and click Speak">
+                        <button onclick="speakText()" class="btn-success">Speak</button>
+                        <button onclick="clearText()" class="btn-warning">Clear</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Speech to Text</h3>
+                    <button id="record-btn" onclick="toggleRecording()" class="btn-primary">Start Recording</button>
+                    <div id="stt-result" class="stt-result">Click Start Recording, speak, and the system will transcribe your speech.</div>
+                </div>
+
+                <div class="section">
+                    <h3>Quick Phrases</h3>
+                    <div class="phrase-buttons">
+                        <button onclick="speakPhrase('Thank you')">Thank you</button>
+                        <button onclick="speakPhrase('Hello')">Hello</button>
+                        <button onclick="speakPhrase('Yes')">Yes</button>
+                        <button onclick="speakPhrase('No')">No</button>
+                        <button onclick="speakPhrase('Excuse me')">Excuse me</button>
+                        <button onclick="speakPhrase('Please help me')">Please help me</button>
+                        <button onclick="speakPhrase('I cannot hear')">I cannot hear</button>
+                        <button onclick="speakPhrase('Please say that again')">Please say that again</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Custom Gesture Mapping</h3>
+                    <div class="input-group">
+                        <input type="text" id="new-gesture" placeholder="Gesture key, e.g., hand_raising">
+                        <input type="text" id="new-display" placeholder="Display name, e.g., Hand Raising">
+                        <input type="text" id="new-message" placeholder="Output message">
+                        <button onclick="addMapping()" class="btn-primary">Add Mapping</button>
+                    </div>
+                    <div id="mappings-list" class="mappings-list">Loading mappings...</div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Supports facial expression recognition, gesture recognition, speech-to-text, and text-to-speech.</p>
+        </footer>
+    </div>
+
+    <script>
+        let statusInterval = null;
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let currentOutputMessage = "";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            startStatusPolling();
+            loadMappings();
+        });
+
+        function startStatusPolling() {
+            if (statusInterval) clearInterval(statusInterval);
+            statusInterval = setInterval(async () => {
+                try {
+                    const response = await fetch("/api/status");
+                    const data = await response.json();
+                    updateStatus(data);
+                } catch (error) {
+                    console.error("Failed to retrieve status:", error);
+                }
+            }, 1000);
+        }
+
+        function updateStatus(data) {
+            if (data.emotion) {
+                const confidence = Math.round((data.emotion.confidence || 0) * 100);
+                document.getElementById("emotion-result").textContent = confidence > 0
+                    ? `${data.emotion.name} (${confidence}%)`
+                    : data.emotion.name;
+            }
+
+            if (data.gesture) {
+                const confidence = Math.round((data.gesture.confidence || 0) * 100);
+                document.getElementById("gesture-result").textContent = confidence > 0
+                    ? `${data.gesture.name} (${confidence}%)`
+                    : data.gesture.name;
+            }
+
+            const gestureMessage = data.gesture && data.gesture.message ? data.gesture.message : "";
+            const emotionMessage = data.emotion && data.emotion.message ? data.emotion.message : "";
+            currentOutputMessage = gestureMessage || emotionMessage || "";
+            document.getElementById("output-message").textContent = currentOutputMessage || "Waiting for recognition...";
+        }
+
+        async function requestSpeech(text) {
+            const response = await fetch("/api/text_to_speech", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text })
+            });
+            const data = await response.json();
+            if (!response.ok || data.error) {
+                throw new Error(data.error || `HTTP ${response.status}`);
+            }
+            if (data.audio_url) {
+                const audio = new Audio(data.audio_url);
+                await audio.play();
+            }
+            return data;
+        }
+
+        async function speakText() {
+            const text = document.getElementById("text-input").value.trim();
+            if (!text) {
+                alert("Please enter text first.");
+                return;
+            }
+            try {
+                await requestSpeech(text);
+            } catch (error) {
+                console.error("Text-to-speech failed:", error);
+                alert(`Text-to-speech failed: ${error.message}`);
+            }
+        }
+
+        async function speakOutput() {
+            if (!currentOutputMessage) {
+                alert("No output message is available yet.");
+                return;
+            }
+            document.getElementById("text-input").value = currentOutputMessage;
+            await speakText();
+        }
+
+        async function speakPhrase(phrase) {
+            document.getElementById("text-input").value = phrase;
+            await speakText();
+        }
+
+        function clearText() {
+            document.getElementById("text-input").value = "";
+        }
+
+        async function toggleRecording() {
+            const recordButton = document.getElementById("record-btn");
+            const resultBox = document.getElementById("stt-result");
+
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data && event.data.size > 0) audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = async () => {
+                        const mimeType = mediaRecorder.mimeType || "audio/webm";
+                        const extension = mimeType.includes("mp4") ? "m4a" : "webm";
+                        const audioBlob = new Blob(audioChunks, { type: mimeType });
+                        const formData = new FormData();
+                        formData.append("audio", audioBlob, `recording.${extension}`);
+                        resultBox.textContent = "Transcribing...";
+
+                        try {
+                            const response = await fetch("/api/speech_to_text", { method: "POST", body: formData });
+                            const data = await response.json();
+                            if (!response.ok || data.error) throw new Error(data.error || "Unknown transcription error");
+                            resultBox.textContent = data.text || "No speech was detected.";
+                            if (data.text) document.getElementById("text-input").value = data.text;
+                        } catch (error) {
+                            console.error("Speech recognition failed:", error);
+                            resultBox.textContent = `Speech recognition failed: ${error.message}`;
+                        } finally {
+                            stream.getTracks().forEach(track => track.stop());
+                        }
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordButton.textContent = "Stop Recording";
+                    recordButton.className = "btn-danger";
+                    resultBox.textContent = "Recording... Please speak.";
+                } catch (error) {
+                    console.error("Microphone access failed:", error);
+                    resultBox.textContent = "Microphone access failed. Please check browser permissions.";
+                    alert("Microphone access failed. Please check browser permissions.");
+                }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordButton.textContent = "Start Recording";
+                recordButton.className = "btn-primary";
+            }
+        }
+
+        async function loadMappings() {
+            const mappingList = document.getElementById("mappings-list");
+            try {
+                const response = await fetch("/api/mappings");
+                const mappings = await response.json();
+                if (!Array.isArray(mappings) || mappings.length === 0) {
+                    mappingList.textContent = "No mappings are available.";
+                    return;
+                }
+                mappingList.innerHTML = mappings.map(item => `
+                    <div class="mapping-item">
+                        <span><strong>${item.display_name || item.gesture_name}</strong>: ${item.output_text}</span>
+                        <button class="btn-danger" onclick="deleteMapping(${item.id})">Delete</button>
+                    </div>
+                `).join("");
+            } catch (error) {
+                console.error("Failed to load mappings:", error);
+                mappingList.textContent = "Failed to load mappings.";
+            }
+        }
+
+        async function addMapping() {
+            const gestureName = document.getElementById("new-gesture").value.trim();
+            const displayName = document.getElementById("new-display").value.trim();
+            const outputText = document.getElementById("new-message").value.trim();
+            if (!gestureName || !outputText) {
+                alert("Please enter at least a gesture key and an output message.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/mappings", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        gesture_name: gestureName,
+                        display_name: displayName || gestureName.replaceAll("_", " "),
+                        output_text: outputText
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok || data.error) throw new Error(data.error || "Failed to add mapping");
+                document.getElementById("new-gesture").value = "";
+                document.getElementById("new-display").value = "";
+                document.getElementById("new-message").value = "";
+                await loadMappings();
+            } catch (error) {
+                console.error("Failed to add mapping:", error);
+                alert(`Failed to add mapping: ${error.message}`);
+            }
+        }
+
+        async function deleteMapping(mappingId) {
+            try {
+                const response = await fetch(`/api/mappings/${mappingId}`, { method: "DELETE" });
+                const data = await response.json();
+                if (!response.ok || data.error) throw new Error(data.error || "Failed to delete mapping");
+                await loadMappings();
+            } catch (error) {
+                console.error("Failed to delete mapping:", error);
+                alert(`Failed to delete mapping: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
