@@ -1,27 +1,10 @@
-# Deep learning
+flask
+flask-cors
 tensorflow==2.13.0
 numpy==1.24.3
-
-# Computer vision
 opencv-python==4.8.1.78
 mediapipe==0.10.7
-
-# Speech processing
-openai-whisper==20231117
-gTTS==2.5.0
-pyaudio==0.2.11
-
-# Web framework
-Flask==3.0.0
-flask-cors==4.0.0
-
-# Data processing and visualization
-pandas==2.0.3
-scikit-learn==1.3.0
-matplotlib==3.7.2
-seaborn==0.12.2
-
-# Utilities
-Pillow==10.1.0
-requests==2.31.0
-python-dotenv==1.0.0
+openai-whisper
+gTTS
+pydub
+Pillow
