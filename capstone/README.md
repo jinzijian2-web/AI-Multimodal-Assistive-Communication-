@@ -12,7 +12,11 @@ This project is a web-based prototype for multimodal assistive communication. It
 - English web interface
 
 ## Installation
+This project is recommended to run with Python 3.11.
 
+Before running the speech-to-text module, FFmpeg must be installed and added to the system PATH.
+
+If the camera does not show video, please check whether the camera privacy switch, Lenovo Privacy Mode, or Windows camera permission is blocking the camera.
 ```bash
 pip install -r requirements.txt
 ```
